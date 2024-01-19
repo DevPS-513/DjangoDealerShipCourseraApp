@@ -3,17 +3,14 @@
  */
 const express = require('express');
 const app=express()
-const PORT = 8080;
+const PORT = 5000;
 const bodyParser = require('body-parser');
 
 const { CloudantV1 } = require('@ibm-cloud/cloudant');
 const { IamAuthenticator } = require('ibm-cloud-sdk-core');
 
-const params={
-    COUCH_URL: "https://72144af7-975a-4c8a-b653-48177d4a207d-bluemix.cloudantnosqldb.appdomain.cloud/" ,
-    IAM_API_KEY: "ySahisbUPABXdqzJc77nAytbcIFLdzMAiLeGuTPRWw5l",
-    COUCH_USERNAME: "72144af7-975a-4c8a-b653-48177d4a207d-bluemix",
-}
+
+const params = require("C:\\localkeys\\IBM_Cloud_Key.json");
 
 
 function get_dealerships(params) {
@@ -100,18 +97,32 @@ function getDbs(cloudant) {
 
     app.get('/api/dealership',(req,res)=> {
 
-        let state = req.query.state;
-        if(state){
-        state=state.replace(/"/g,'');
-        state=state.replace(/`/g,'');
+        let filterProperty;
+        let filterValue;
+    
+        for (let prop in req.query) {
+            filterProperty = prop;
+            filterValue = req.query[prop];
         }
+    
+
+        if(filterValue){
+        filterValue=filterValue.replace(/"/g,'');
+        filterValue=filterValue.replace(/`/g,'');
+        }
+
+        if(filterProperty){
+            filterProperty=filterProperty.replace(/"/g,'');
+            filterProperty=filterProperty.replace(/`/g,'');
+            }
 
         get_dealerships(params)
         .then(result => {
-            if (state) {
+            if (filterProperty && filterValue ) {
 
-                let filteredResult = result.result.filter(dealership=> dealership.doc.state === state);
-                    res.status(200).send(filteredResult);
+                let filteredResult = result.result.filter(dealership=> dealership.doc[filterProperty] == filterValue);
+                console.log(filteredResult)  
+                res.status(200).send(filteredResult);
             } else {
                 res.status(200).send(result);
             }
@@ -122,18 +133,33 @@ function getDbs(cloudant) {
 
     app.get('/api/review',(req,res)=> {
 
-        let dealerID = req.query.dealerID;
-        if(dealerID){
-            dealerID=dealerID.replace(/"/g,'');
-            dealerID=dealerID.replace(/`/g,'');
+        let filterProperty;
+        let filterValue;
+    
+        for (let prop in req.query) {
+            filterProperty = prop;
+            filterValue = req.query[prop];
+        }
+    
+
+        if(filterValue){
+        filterValue=filterValue.replace(/"/g,'');
+        filterValue=filterValue.replace(/`/g,'');
+        }
+
+        if(filterProperty){
+            filterProperty=filterProperty.replace(/"/g,'');
+            filterProperty=filterProperty.replace(/`/g,'');
             }
+
+        console.log(filterProperty)
+        console.log(filterValue)
 
         get_reviews(params)
         .then(result => {
-            if (dealerID) {
-
-                let filteredResult = result.result.filter(review=> Number(review.doc.id) === Number(dealerID));
-                console.log(filteredResult)
+            if (filterProperty && filterValue ) {
+                console.log(result.result)
+                let filteredResult = result.result.filter(review=> review.doc[filterProperty] == filterValue);
                     res.status(200).send(filteredResult);
             } else {
                 res.status(200).send(result);
