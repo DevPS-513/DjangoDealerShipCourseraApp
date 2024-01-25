@@ -1,7 +1,5 @@
 # Abstract
 
-# Full Stack Final Project Website
-
 This website is a full stack project that utilizes Django and Node.js with Express. For the coursera course on Django Cloud Development
 
 - **Django:** Used for rendering a list of car dealerships and associated user reviews.
